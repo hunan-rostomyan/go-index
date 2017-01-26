@@ -4,9 +4,24 @@ import (
 	"sort"
 )
 
+func Count(tokens []Token) map[Token]int {
+	// Count the occurrences.
+	counts := make(map[Token]int)
+	for _, token := range tokens {
+		_, ok := counts[token];
+		if !ok {
+			counts[token] = 1
+		} else {
+			counts[token] += 1
+		}
+	}
+
+	return counts
+}
+
 // Tally the tokens in the decreasing order of frequency. Sorting is unstable.
 // Returns the sorted keys, the inverted counts, and the total number of occurrences.
-func Count(tokens []Token) ([]int, map[int][]Token, int) {
+func SortedCount(tokens []Token) ([]int, map[int][]Token, int) {
 	// Count the occurrences.
 	counts := make(map[Token]int)
 	for _, token := range tokens {
