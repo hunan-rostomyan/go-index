@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+	"io/ioutil"
+	"encoding/json"
+)
+
 func main() {
 	col := NewLocalCollection("/Users/hunan/experiments/index/docs-bosh", "(.*).html.md.erb$")
 
@@ -53,7 +59,6 @@ func main() {
 	for token := range vocab {
 		index[token] = make(map[string]float64)
 		for _, doc := range documents {
-			//tokens := doc.Contents
 			_tf := tf_table[doc.Id][token]
 			if _tf == 0 {
 				continue
@@ -66,4 +71,20 @@ func main() {
 			index[token][doc.Name] = _tfidf
 		}
 	}
+
+	// Prepare index for json conversion
+	serializableIndex := make(map[string]map[string]float64)
+	for token := range index {
+		tokenStr := token.Datum
+		serializableIndex[tokenStr] = make(map[string]float64)
+		for docName, rank := range index[token] {
+			serializableIndex[tokenStr][docName] = rank
+		}
+	}
+
+	b, err := json.Marshal(serializableIndex)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	_ = ioutil.WriteFile("index.json", b, 0644)
 }
