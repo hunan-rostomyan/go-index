@@ -1,90 +1,29 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"io/ioutil"
 	"encoding/json"
 )
 
-func main() {
-	col := NewLocalCollection("/Users/hunan/experiments/index/docs-bosh", "(.*).html.md.erb$")
+type Index map[Token]map[string]float64
 
-	// Prepare the indexing tables
-	documents := col.Documents()
-	num_of_docs := 0
-	vocab := make(map[Token]bool)
-	tf_table := make(map[int]map[Token]int)
-	df_table := make(map[Token]map[int]bool)
-
-	// For each document
-	for _, doc := range documents {
-
-		num_of_docs += 1
-
-		// Grab its tokens
-		tokens := doc.Contents
-
-		// Compute its token frequencies
-		counts := Count(tokens)
-
-		// Allocate an entry to hold its token frequencies
-		tf_table[doc.Id] = make(map[Token]int)
-
-		// For each token in the document:
-		for _, token := range tokens {
-
-			// Add to the vocabulary, unless already present
-			if _, ok := vocab[token]; !ok {
-				vocab[token] = true
-			}
-
-			// Compute the term frequency
-			tf_table[doc.Id][token] = tf(token, counts)
-
-			// Compute the document frequency
-			_, ok := df_table[token]
-			if !ok {
-				df_table[token] = make(map[int]bool)
-			} else {
-				_, ok := df_table[token][doc.Id]
-				if !ok {
-					df_table[token][doc.Id] = true
-				}
-			}
+// From https://gist.github.com/mdwhatcott/8dd2eef0042f7f1c0cd8
+func (index Index) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString("{")
+	size := len(index)
+	i := 0
+	for key, value := range index {
+		jsonValue, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		buffer.WriteString(fmt.Sprintf("\"%s\":%s", key, jsonValue))
+		i += 1
+		if i < size {
+			buffer.WriteString(",")
 		}
 	}
-
-	// Index
-	index := make(map[Token]map[string]float64)
-	for token := range vocab {
-		index[token] = make(map[string]float64)
-		for _, doc := range documents {
-			_tf := tf_table[doc.Id][token]
-			if _tf == 0 {
-				continue
-			}
-			_idf := idf(token, num_of_docs, df_table)
-			if _idf == 0 {
-				continue
-			}
-			_tfidf := float64(_tf) * _idf
-			index[token][doc.Name] = _tfidf
-		}
-	}
-
-	// Prepare index for json conversion
-	serializableIndex := make(map[string]map[string]float64)
-	for token := range index {
-		tokenStr := token.Datum
-		serializableIndex[tokenStr] = make(map[string]float64)
-		for docName, rank := range index[token] {
-			serializableIndex[tokenStr][docName] = rank
-		}
-	}
-
-	b, err := json.Marshal(serializableIndex)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	_ = ioutil.WriteFile("index.json", b, 0644)
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
 }

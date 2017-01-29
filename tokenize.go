@@ -1,12 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
 type Token struct {
-	Datum string
+	Datum string `json:"datum"`
+}
+
+func (token Token) String() string {
+	return token.Datum
 }
 
 func Tokenize(text string) []Token {
@@ -19,8 +22,4 @@ func Tokenize(text string) []Token {
 		}
 	}
 	return tokens
-}
-
-func (token Token) String() string {
-	return fmt.Sprintf("Token (%s)", token.Datum)
 }
