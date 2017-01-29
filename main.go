@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// Index, Rank
-	var index Index = make(map[Token]map[string]float64)
+	var index Index = make(Index)
 
 	for token := range vocab {
 		index[token] = make(map[string]float64)
@@ -74,7 +74,7 @@ func main() {
 	}
 
 	// Save
-	b, err := json.Marshal(index)
+	b, err := json.MarshalIndent(index, "", "  ")
 	if err != nil {
 		fmt.Println("error:", err)
 	}
