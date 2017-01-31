@@ -46,7 +46,7 @@ func (col LocalCollection) Documents() ([]Document, int) {
 			fileName := f.Name()
 			if col.Pattern.MatchString(fileName) {
 				contents, _ := ioutil.ReadFile(filepath.Join(col.Path, fileName))
-				tokens := Text2Tokens(string(contents))
+				tokens := TextToTokens(string(contents))
 				docs = append(docs, NewDocument(fileName, tokens))
 				size++
 			}

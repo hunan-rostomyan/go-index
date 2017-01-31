@@ -86,7 +86,7 @@ func TestDocumentContents(t *testing.T) {
 	doc := docs[0]
 
 	// Ensure document contents is the right list of tokens.
-	expectedTokens := Text2Tokens(string(data))
+	expectedTokens := TextToTokens(string(data))
 	expectedTokenNum := len(expectedTokens)
 	actualTokens := doc.Contents
 	actualTokenNum := len(actualTokens)

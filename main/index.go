@@ -14,6 +14,7 @@ type Vocab map[Token]bool
 // BuildIndex extracts from documents an index of terms and their
 // relevance to each of the documents they appear in.
 func BuildIndex(documents []Document, numOfDocs int) Index {
+
 	// Prepare the indexing tables
 	vocab := make(Vocab)
 	tf_table := make(Tftable)

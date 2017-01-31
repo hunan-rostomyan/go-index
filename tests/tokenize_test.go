@@ -21,9 +21,9 @@ func singleLineData() []byte {
 		return data
 }
 
-func TestText2TokensLineNumbers(t *testing.T) {
+func TestTextToTokensLineNumbers(t *testing.T) {
 	data := dummyData()
-	tokens := Text2Tokens(string(data))
+	tokens := TextToTokens(string(data))
 
 	// The word 'abstract' should be on lines 1 and 4 (0-indexed).
 	for _, token := range tokens {
@@ -48,9 +48,9 @@ func TestText2TokensLineNumbers(t *testing.T) {
 	}
 }
 
-func TestText2TokensLineNumbersSingleLine(t *testing.T) {
+func TestTextToTokensLineNumbersSingleLine(t *testing.T) {
 	data := singleLineData()
-	tokens := Text2Tokens(string(data))
+	tokens := TextToTokens(string(data))
 
 	// Every token should be from line 0
 	for _, token := range tokens {
@@ -62,9 +62,9 @@ func TestText2TokensLineNumbersSingleLine(t *testing.T) {
 	}
 }
 
-func TestText2TokensSize(t *testing.T) {
+func TestTextToTokensSize(t *testing.T) {
 	data := dummyData()
-	tokens := Text2Tokens(string(data))
+	tokens := TextToTokens(string(data))
 
 	// Ensure that the right number of tokens is generated
 	if len(tokens) != 57 {
@@ -72,12 +72,22 @@ func TestText2TokensSize(t *testing.T) {
 	}
 }
 
-func TestText2TokensSizeSingleLine(t *testing.T) {
+func TestTextToTokensSizeSingleLine(t *testing.T) {
 	data := singleLineData()
-	tokens := Text2Tokens(string(data))
+	tokens := TextToTokens(string(data))
 
 	// Ensure that the right number of tokens is generated
 	if len(tokens) != 57 {
 		t.Error(fmt.Sprintf("there should be %d tokens not %d", 57, len(tokens)))
+	}
+}
+
+func TestTextToTokensLowercasing(t *testing.T) {
+	text := "RepLAce"
+	expected := "replace"
+	actual := TextToTokens(text)[0].Datum
+	if actual != expected {
+		t.Error(fmt.Sprintf(
+			"expected '%s' to transform to '%s' not '%s'", text, expected, actual))
 	}
 }
