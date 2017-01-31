@@ -1,7 +1,8 @@
 package main
 
+// Stop filters 10 of the most common words out of the list
+// of tokens. It returns the filtered list.
 func Stop(tokens []Token) []Token {
-	// Some very common words
 	stops := map[string]bool{
 		"the": true,
 		"be": true,

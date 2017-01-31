@@ -4,10 +4,6 @@ import (
 	"math"
 )
 
-func Tokens(doc Document) []Token {
-	return doc.Contents
-}
-
 func tf(term Token, counts map[Token]int) int {
 	return counts[term]
 }

@@ -1,0 +1,83 @@
+package tests
+
+import (
+	"fmt"
+	"testing"
+	. "github.com/hunan-rostomyan/go-index/main"
+)
+
+func dummyData() []byte {
+		data := []byte(`Empiricists are in general rather suspicious with respect
+to any kind of abstract entities like properties, classes, relations, numbers,
+propositions, etc. They usually feel much more in sympathy with nominalists than
+with realists (in the medieval sense). As far as possible they try to avoid any
+reference to abstract entities and to restrict themselves to what is sometimes
+called a nominalistic language, i.e., one not containing such references.`)
+		return data
+}
+
+func singleLineData() []byte {
+		data := []byte("Empiricists are in general rather suspicious with respect to any kind of abstract entities like properties, classes, relations, numbers, propositions, etc. They usually feel much more in sympathy with nominalists than with realists (in the medieval sense). As far as possible they try to avoid any reference to abstract entities and to restrict themselves to what is sometimes called a nominalistic language, i.e., one not containing such references.")
+		return data
+}
+
+func TestText2TokensLineNumbers(t *testing.T) {
+	data := dummyData()
+	tokens := Text2Tokens(string(data))
+
+	// The word 'abstract' should be on lines 1 and 4 (0-indexed).
+	for _, token := range tokens {
+		if token.Datum == "abstract" {
+			if !(token.LineNum == 1 || token.LineNum == 4) {
+				t.Error(fmt.Sprintf(
+					"'abstract' should appear on lines 1 and 4, not %d",
+					token.LineNum))
+			}
+		}
+	}
+
+	// The word 'with' should be on lines 0, 2 and 3 (0-indexed).
+	for _, token := range tokens {
+		if token.Datum == "with" {
+			if !(token.LineNum == 0 || token.LineNum == 2 || token.LineNum == 3) {
+				t.Error(fmt.Sprintf(
+					"'with' should appear on lines 1 and 4, not %d",
+					token.LineNum))
+			}
+		}
+	}
+}
+
+func TestText2TokensLineNumbersSingleLine(t *testing.T) {
+	data := singleLineData()
+	tokens := Text2Tokens(string(data))
+
+	// Every token should be from line 0
+	for _, token := range tokens {
+		if token.LineNum != 0 {
+			t.Error(fmt.Sprintf(
+				"token '%s' was expected to be on line 0, but was on line %d",
+				token.Datum, token.LineNum))
+		}
+	}
+}
+
+func TestText2TokensSize(t *testing.T) {
+	data := dummyData()
+	tokens := Text2Tokens(string(data))
+
+	// Ensure that the right number of tokens is generated
+	if len(tokens) != 57 {
+		t.Error(fmt.Sprintf("there should be %d tokens not %d", 57, len(tokens)))
+	}
+}
+
+func TestText2TokensSizeSingleLine(t *testing.T) {
+	data := singleLineData()
+	tokens := Text2Tokens(string(data))
+
+	// Ensure that the right number of tokens is generated
+	if len(tokens) != 57 {
+		t.Error(fmt.Sprintf("there should be %d tokens not %d", 57, len(tokens)))
+	}
+}
