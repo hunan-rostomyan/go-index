@@ -37,7 +37,7 @@ func TestPatternAll(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	col := NewLocalCollection(dir, "(.*)")
-	docNum := len(col.Documents())
+	_, docNum := col.Documents()
 	if docNum != 3 {
 		t.Error(fmt.Sprintf("expected 3 documents found %d", docNum))
 	}
@@ -49,7 +49,7 @@ func TestPatternEmptyString(t *testing.T) {
 
 	// All file names should match the empty string.
 	col := NewLocalCollection(dir, "")
-	docNum := len(col.Documents())
+	_, docNum := col.Documents()
 	if docNum != 3 {
 		t.Error(fmt.Sprintf("expected 3 documents found %d", docNum))
 	}
@@ -60,7 +60,7 @@ func TestPatternEndsWith(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	col := NewLocalCollection(dir, ".html.md.erb$")
-	docNum := len(col.Documents())
+	_, docNum := col.Documents()
 	if docNum != 2 {
 		t.Error(fmt.Sprintf("expected 2 documents found %d", docNum))
 	}
@@ -71,7 +71,7 @@ func TestPatternExactMatch(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	col := NewLocalCollection(dir, "^LICENSE$")
-	docNum := len(col.Documents())
+	_, docNum := col.Documents()
 	if docNum != 1 {
 		t.Error(fmt.Sprintf("expected 1 document found %d", docNum))
 	}
@@ -82,7 +82,8 @@ func TestDocumentContents(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	col := NewLocalCollection(dir, "^carnap.excerpt$")
-	doc := col.Documents()[0]
+	docs, _ := col.Documents()
+	doc := docs[0]
 
 	// Ensure document contents is the right list of tokens.
 	expectedTokens := Text2Tokens(string(data))

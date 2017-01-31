@@ -4,12 +4,10 @@ import (
 	"math"
 )
 
-func tf(term Token, counts map[Token]int) int {
-	return counts[term]
-}
-
-func idf(term Token, num_of_docs int, df_table map[Token]map[int]bool) float64 {
-	df := len(df_table[term])
+// Idf computes the inverse document frequency of token w.r.t the
+// given document frequency table.
+func idf(token Token, num_of_docs int, df_table Dftable) float64 {
+	df := len(df_table[token])
 	if df == 0 {
 		return 0
 	}
