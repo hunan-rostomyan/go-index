@@ -67,8 +67,8 @@ func TestTextToTokensSize(t *testing.T) {
 	tokens := TextToTokens(string(data))
 
 	// Ensure that the right number of tokens is generated
-	if len(tokens) != 57 {
-		t.Error(fmt.Sprintf("there should be %d tokens not %d", 57, len(tokens)))
+	if len(tokens) != 55 {
+		t.Error(fmt.Sprintf("there should be %d tokens not %d", 55, len(tokens)))
 	}
 }
 
@@ -77,8 +77,8 @@ func TestTextToTokensSizeSingleLine(t *testing.T) {
 	tokens := TextToTokens(string(data))
 
 	// Ensure that the right number of tokens is generated
-	if len(tokens) != 57 {
-		t.Error(fmt.Sprintf("there should be %d tokens not %d", 57, len(tokens)))
+	if len(tokens) != 55 {
+		t.Error(fmt.Sprintf("there should be %d tokens not %d", 55, len(tokens)))
 	}
 }
 

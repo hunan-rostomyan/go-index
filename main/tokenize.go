@@ -33,7 +33,7 @@ func TextToTokens(text string) []Token {
 		line = Depunct(line)
 
 		for _, datum := range strings.Split(line, " ") {
-			if len(datum) != 0 {
+			if len(datum) > 1 {  // ignore one-letter words
 				tokens = append(tokens, Token{datum, lineNum})
 			}
 		}
