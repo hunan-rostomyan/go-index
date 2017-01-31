@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"regexp"
 )
@@ -40,7 +41,10 @@ func (col LocalCollection) Documents() ([]Document, int) {
 	docs := []Document{}
 	size := 0
 
-	files, _ := ioutil.ReadDir(col.Path)
+	files, err := ioutil.ReadDir(col.Path)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("error: not a valid path '%s'", col.Path))
+	}
 	for _, f := range files {
 		if f.Mode().IsRegular() {
 			fileName := f.Name()

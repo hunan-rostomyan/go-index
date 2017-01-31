@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"encoding/json"
+	"path/filepath"
 )
 
 func main() {
-	col := NewLocalCollection("/Users/hunan/experiments/index/docs-bosh", "(.*).html.md.erb$")
+	path, _ := filepath.Abs("../../cloudfoundry/docs-bosh")
+	col := NewLocalCollection(path, "(.*).html.md.erb$")
 	index := BuildIndex(col.Documents())
 
 	// Save
