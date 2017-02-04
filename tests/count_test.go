@@ -15,21 +15,17 @@ func TestCount(t *testing.T) {
 		Token{"baz", 1},
 		Token{"baz", 2},
 	}
-	counts := Count(tokens)
-	for token := range counts {
-		switch token.Datum {
-		case "foo":
-			if counts[token] != 1 {
-				t.Error(fmt.Sprintf("expecting 'foo' count to be 1 not %d", counts[token]))
-			}
-		case "bar":
-			if counts[token] != 2 {
-				t.Error(fmt.Sprintf("expecting 'bar' count to be 2 not %d", counts[token]))
-			}
-		case "baz":
-			if counts[token] != 3 {
-				t.Error(fmt.Sprintf("expecting 'baz' count to be 3 not %d", counts[token]))
-			}
-		}
+
+	counter := NewCounter(tokens)
+
+	if counter.Lookup("foo") != 1 {
+		t.Error(fmt.Sprintf("expecting 'foo' count to be 1 not %d", counter.Lookup("foo")))
 	}
+	if counter.Lookup("bar") != 2 {
+		t.Error(fmt.Sprintf("expecting 'bar' count to be 2 not %d", counter.Lookup("bar")))
+	}
+	if counter.Lookup("baz") != 3 {
+		t.Error(fmt.Sprintf("expecting 'baz' count to be 3 not %d", counter.Lookup("baz")))
+	}
+
 }
