@@ -10,10 +10,10 @@ import (
 func main() {
 	path, _ := filepath.Abs("../../cloudfoundry/docs-bosh")
 	col := NewLocalCollection(path, "(.*).html.md.erb$")
-	index := BuildIndex(col.Documents())
 
-	// Save
-	b, err := json.MarshalIndent(index, "", "  ")
+	// Build the inverted index
+	invertedIndex := BuildInvertedIndex(col.Documents())
+	b, err := json.MarshalIndent(invertedIndex, "", "  ")
 	if err != nil {
 		fmt.Println("error:", err)
 	}

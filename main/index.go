@@ -4,32 +4,86 @@ import (
 	"bytes"
 	"fmt"
 	"encoding/json"
+	"math"
 )
 
 type TokenCounts map[string]int
-type Index map[string]TokenCounts
+type DocumentRelevance map[string]float64
+type InvertedIndex map[string]DocumentRelevance
 
-// BuildIndex extracts from documents an index of terms and their
-// relevance to each of the documents they appear in.
-func BuildIndex(documents []Document, numOfDocs int) Index {
-	var index Index = make(Index)
+// TfTable associates a term and a document with the number of times
+// the term occurs in the document.
+type TfTable map[string]map[string]int
 
-	// For each document
+// DcTable associates terms with their document counts.
+type DcTable map[string]map[string]int
+
+// BuildInvertedIndex extracts from documents an index of terms and their
+// relevance to each of the documents they appear in. It belongs to the
+// family of tf.idf algorithms. Returns the inverted index.
+func BuildInvertedIndex(documents []Document, numOfDocs int) InvertedIndex {	
+	vocab := make(map[string]bool)
+	var tfTable TfTable = make(TfTable)  // map[string]map[string]int
+	var dcTable DcTable = make(DcTable)  // map[string]map[string]int
+
+	// Collect statistics
 	for _, doc := range documents {
 
-		// Create an entry for it in the index
-		index[doc.Name] = make(map[string]int)
-
-		// Grab its tokens
 		tokens := doc.Contents
-
-		// Compute its token frequencies
 		counter := NewCounter(tokens)
+		tfTable[doc.Name] = make(map[string]int)
+
 		for _, counterEntry := range counter.Top(0, "desc") {
-			index[doc.Name][counterEntry.Word] = counterEntry.Count
+
+			// Add term to the vocabulary, unless already present
+			if _, ok := vocab[counterEntry.Word]; !ok {
+				vocab[counterEntry.Word] = true
+			}
+
+			tfTable[doc.Name][counterEntry.Word] = counterEntry.Count
+
+			// Clip the count, since we're interested in membership, not count.
+			wordCount := counterEntry.Count
+			if wordCount > 0 {
+				wordCount = 1
+			}
+			dcTable[counterEntry.Word] = make(map[string]int)
+			dcTable[counterEntry.Word][doc.Name] = wordCount
 		}
+
 	}
 
+	// Index
+	var index InvertedIndex = make(InvertedIndex)
+	for term := range vocab {
+
+		index[term] = make(DocumentRelevance)
+
+		// the number of documents the term occurs in
+		// (not document-dependent, so it's outside the loop)
+		dc := 0
+		for _, docCount := range dcTable[term] {
+			dc += docCount
+		}
+
+		for _, doc := range documents {
+
+			// term frequency
+			tf := tfTable[doc.Name][term]
+			if tf == 0 {
+				continue
+			}
+
+			// inverse document frequency
+			idf := math.Log10(float64(numOfDocs) / float64(dc))
+			if idf == 0 {
+				continue
+			}
+
+			// final relevance score
+			index[term][doc.Name] = float64(tf) * idf
+		}
+	}
 	return index
 }
 
@@ -48,7 +102,7 @@ func (tokenCounts TokenCounts) MarshalJSON() ([]byte, error) {
 }
 
 // From https://gist.github.com/mdwhatcott/8dd2eef0042f7f1c0cd8
-func (index Index) MarshalJSON() ([]byte, error) {
+func (index InvertedIndex) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString("{")
 	i := 0
 	for key, value := range index {
@@ -65,3 +119,4 @@ func (index Index) MarshalJSON() ([]byte, error) {
 	buffer.WriteString("}")
 	return buffer.Bytes(), nil
 }
+
