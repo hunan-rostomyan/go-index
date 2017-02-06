@@ -8,8 +8,7 @@ import (
 )
 
 type TokenCounts map[string]int
-type DocumentRelevance map[string]float64
-type InvertedIndex map[string]DocumentRelevance
+type InvertedIndex map[string]map[string]float64
 
 // TfTable associates a term and a document with the number of times
 // the term occurs in the document.
@@ -57,7 +56,7 @@ func BuildInvertedIndex(documents []Document, numOfDocs int) InvertedIndex {
 	var index InvertedIndex = make(InvertedIndex)
 	for term := range vocab {
 
-		index[term] = make(DocumentRelevance)
+		index[term] = make(map[string]float64)
 
 		// the number of documents the term occurs in
 		// (not document-dependent, so it's outside the loop)
