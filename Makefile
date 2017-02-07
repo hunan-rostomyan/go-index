@@ -1,7 +1,7 @@
 FILES=main/*.go
 TEST_FILES=tests/*.go
 
-all:
+build:
 	go run $(FILES)
 
 test:
